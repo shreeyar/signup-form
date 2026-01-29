@@ -48,7 +48,7 @@ with st.form("signup", clear_on_submit=True):
     full_name = st.text_input("Full name", placeholder="Jane Doe")
     email = st.text_input("Email", placeholder="jane@example.com")
     lansing_choice = st.radio(
-        "Will you be co-locating in the Lansing Office on February 3?",
+        "Will you be co-locating in the Lansing Office on March 3?",
         options=["Yes", "No"],
         horizontal=True
     )
