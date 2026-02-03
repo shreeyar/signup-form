@@ -5,6 +5,7 @@ import os
 import csv
 import threading
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import streamlit as st
 
 # Configure a OneDrive-synced folder path via env var for portability
@@ -67,7 +68,7 @@ if submitted:
         "FullName": full_name.strip(),
         "Email": email.strip(),
         "Lansing": lansing_choice,  # "Yes" or "No" from the radio
-        "SubmittedAt": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "SubmittedAt": datetime.now(ZoneInfo("America/Detroit")).strftime("%Y-%m-%d %H:%M:%S"),
     }
 
     try:
@@ -91,4 +92,4 @@ if os.path.exists(CSV_PATH):
     except Exception as e:
         st.warning(f"Unable to load preview: {e}")
 else:
-    st.info("No submissions yet.")
+    st.info("No submissions yet today.")
