@@ -31,11 +31,19 @@ FORM_FIELDS = [
         "placeholder": "Jane Doe",
         "required": True,
     },
+    {
+        "key": "Going",
+        "name": "Are you going?",
+        "type": "radio",
+        "options": ["Yes", "No"],
+        "horizontal": True,
+        "required": True,
+    },
 ]
 
 # CSV Configuration
 # Defines the columns in the output CSV file
-CSV_COLUMNS = ["Name", "SubmittedAt"]
+CSV_COLUMNS = ["Name", "Going", "SubmittedAt"]
 
 # Timezone for submissions
 TIMEZONE = "America/Detroit"
