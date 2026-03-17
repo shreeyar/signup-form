@@ -45,9 +45,9 @@ FORM_FIELDS = [
 # Defines the columns in the output CSV file
 CSV_COLUMNS = ["Name", "Going", "SubmittedAt"]
 
-# Display Configuration
-# Columns to display in the recent submissions table
-DISPLAY_COLUMNS = ["Name", "SubmittedAt"]
+# Email Configuration
+# Email address to receive submissions
+RECIPIENT_EMAIL = "shreramesh@deloitte.com"
 
 # Timezone for submissions
 TIMEZONE = "America/Detroit"

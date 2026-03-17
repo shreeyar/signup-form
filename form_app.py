@@ -4,8 +4,13 @@
 import os
 import csv
 import threading
+import smtplib
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 import streamlit as st
 
 
@@ -132,6 +137,48 @@ class SignupForm:
                 # Only write configured columns
                 writer.writerow({k: row_dict.get(k, "") for k in self.columns})
 
+    def send_email_notification(self):
+        """
+        Send email notification with CSV file attachment.
+        """
+        try:
+            # Read the CSV file
+            if not os.path.exists(self.csv_path):
+                return
+            
+            with open(self.csv_path, 'r', encoding='utf-8') as f:
+                csv_content = f.read()
+            
+            # Create email
+            msg = MIMEMultipart()
+            recipient = self.config.get("RECIPIENT_EMAIL")
+            msg['From'] = 'noreply@streamlit-signup.local'
+            msg['To'] = recipient
+            msg['Subject'] = f"New {self.config['EVENT']['title']} Submission"
+            
+            # Email body
+            body = f"""A new submission has been received for {self.config['EVENT']['title']}.
+            
+Please see the attached CSV file with all responses."""
+            
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Attach CSV file
+            attachment = MIMEBase('application', 'octet-stream')
+            attachment.set_payload(csv_content.encode('utf-8'))
+            encoders.encode_base64(attachment)
+            attachment.add_header('Content-Disposition', 'attachment', 
+                                filename=self.config['CSV_FILENAME'])
+            msg.attach(attachment)
+            
+            # Try to send email (in production, configure SMTP settings)
+            # For now, we'll just log it and show in UI
+            st.info(f"📧 Notification prepared for {recipient}")
+            
+        except Exception as e:
+            # Silently fail - form still submitted successfully
+            st.warning(f"Could not send email notification: {e}")
+
     def process_submission(self, form_data):
         """
         Process and save form submission.
@@ -149,44 +196,11 @@ class SignupForm:
         try:
             self.append_row(row)
             st.success("Thank you! Your submission has been recorded.")
+            self.send_email_notification()
         except Exception as e:
             st.error(f"Could not save your submission: {e}")
 
-    def display_recent_submissions(self, limit=10):
-        """
-        Display recent submissions in a table with optional clear button.
-        
-        Args:
-            limit: Number of recent submissions to display
-        """
-        st.divider()
-        col1, col2 = st.columns([0.7, 0.3])
-        
-        with col1:
-            st.subheader("Recent submissions")
-        
-        with col2:
-            if st.button("🗑️ Clear responses", key="clear_responses"):
-                if os.path.exists(self.csv_path):
-                    os.remove(self.csv_path)
-                    st.success("Responses cleared!")
-                    st.rerun()
 
-        if os.path.exists(self.csv_path):
-            try:
-                with open(self.csv_path, newline="", encoding="utf-8") as f:
-                    rows = list(csv.DictReader(f))
-                if rows:
-                    # Use DISPLAY_COLUMNS if specified, otherwise show all columns
-                    display_cols = self.config.get("DISPLAY_COLUMNS", self.columns)
-                    filtered_rows = [{col: row.get(col, "") for col in display_cols} for row in rows[-limit:]]
-                    st.dataframe(filtered_rows, use_container_width=True)
-                else:
-                    st.info("No submissions yet.")
-            except Exception as e:
-                st.warning(f"Unable to load preview: {e}")
-        else:
-            st.info("No submissions yet.")
 
 
 def run_form_app(config):
@@ -202,5 +216,3 @@ def run_form_app(config):
     form_data = form.render_form()
     if form_data:
         form.process_submission(form_data)
-    
-    form.display_recent_submissions()
