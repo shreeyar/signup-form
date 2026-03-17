@@ -45,6 +45,10 @@ FORM_FIELDS = [
 # Defines the columns in the output CSV file
 CSV_COLUMNS = ["Name", "Going", "SubmittedAt"]
 
+# Display Configuration
+# Columns to display in the recent submissions table
+DISPLAY_COLUMNS = ["Name", "SubmittedAt"]
+
 # Timezone for submissions
 TIMEZONE = "America/Detroit"
 

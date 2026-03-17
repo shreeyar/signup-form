@@ -154,20 +154,33 @@ class SignupForm:
 
     def display_recent_submissions(self, limit=10):
         """
-        Display recent submissions in a table.
+        Display recent submissions in a table with optional clear button.
         
         Args:
             limit: Number of recent submissions to display
         """
         st.divider()
-        st.subheader("Recent submissions")
+        col1, col2 = st.columns([0.7, 0.3])
+        
+        with col1:
+            st.subheader("Recent submissions")
+        
+        with col2:
+            if st.button("🗑️ Clear responses", key="clear_responses"):
+                if os.path.exists(self.csv_path):
+                    os.remove(self.csv_path)
+                    st.success("Responses cleared!")
+                    st.rerun()
 
         if os.path.exists(self.csv_path):
             try:
                 with open(self.csv_path, newline="", encoding="utf-8") as f:
                     rows = list(csv.DictReader(f))
                 if rows:
-                    st.dataframe(rows[-limit:], use_container_width=True)
+                    # Use DISPLAY_COLUMNS if specified, otherwise show all columns
+                    display_cols = self.config.get("DISPLAY_COLUMNS", self.columns)
+                    filtered_rows = [{col: row.get(col, "") for col in display_cols} for row in rows[-limit:]]
+                    st.dataframe(filtered_rows, use_container_width=True)
                 else:
                     st.info("No submissions yet.")
             except Exception as e:
