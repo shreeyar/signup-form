@@ -13,7 +13,7 @@ import streamlit as st
 # Example macOS: export DATA_DIR="$HOME/Library/CloudStorage/OneDrive-OrgName/form-data"
 DATA_DIR = os.environ.get("DATA_DIR", "data")
 CSV_PATH = os.path.join(DATA_DIR, "submissions.csv")
-COLUMNS = ["FullName", "Email", "Lansing", "SubmittedAt"]
+COLUMNS = ["FullName", "Email", "Lansing", "Role", "SubmittedAt"]
 
 # Hidden mirror file (same directory; name starts with a dot)
 RECENT_FILE = os.path.join(os.path.dirname(DATA_DIR), ".recent_submissions.csv")
@@ -41,15 +41,28 @@ def append_recent_row(row_dict):
             # Only write known columns to keep schema stable
             w.writerow({k: row_dict.get(k, "") for k in COLUMNS})
 
-st.set_page_config(page_title="GenAI Session Sign-Up", page_icon="📝", layout="centered")
-st.title("GenAI Session Sign-Up")
-st.write("Interested in attending the GenAI in Action: GenAI 101 learning session? Sign up below!")
+st.set_page_config(page_title="AI First Session 2 Sign-Up", page_icon="📝", layout="centered")
+st.title("AI First Session 2 Sign-Up")
+st.write("Interested in attending Session 2 of the AI First learning series? Sign up below!")
 
 with st.form("signup", clear_on_submit=True):
     full_name = st.text_input("Full name", placeholder="Jane Doe")
     email = st.text_input("Email", placeholder="jane@example.com")
+    role = st.selectbox(
+        "Role",
+        options=[
+            "Developer",
+            "Business Analyst",
+            "Tester/QA",
+            "Project Manager",
+            "Design/UX",
+            "Leadership/People Manager",
+            "Change Management",
+            "Other",
+        ],
+    )
     lansing_choice = st.radio(
-        "Will you be co-locating in the Lansing Office on March 3?",
+        "Will you be co-locating in the Lansing Office on April 14?",
         options=["Yes", "No"],
         horizontal=True
     )
@@ -68,6 +81,7 @@ if submitted:
         "FullName": full_name.strip(),
         "Email": email.strip(),
         "Lansing": lansing_choice,  # "Yes" or "No" from the radio
+        "Role": role,
         "SubmittedAt": datetime.now(ZoneInfo("America/Detroit")).strftime("%Y-%m-%d %H:%M:%S"),
     }
 
