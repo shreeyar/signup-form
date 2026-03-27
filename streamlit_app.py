@@ -100,7 +100,7 @@ if os.path.exists(CSV_PATH):
         with open(CSV_PATH, newline="", encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
         if rows:
-            st.dataframe(rows[-10:], use_container_width=True)
+            st.dataframe(rows[-50:], use_container_width=True)
         else:
             st.info("No submissions yet.")
     except Exception as e:
