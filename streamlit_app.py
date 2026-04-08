@@ -17,6 +17,8 @@ COLUMNS = ["FullName", "Email", "Lansing", "Role", "SubmittedAt"]
 MAX_SUBMISSIONS = 25
 # Set as YYYY-MM-DD (America/Detroit).
 SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-04-08")
+# Backend override: auto, open, or closed.
+SURVEY_STATUS = os.environ.get("SURVEY_STATUS", "closed").strip().lower()
 CAPACITY_MESSAGE = (
     "Thank you for your interest! Unfortunately we are at capacity for this in-person session."
 )
@@ -36,6 +38,13 @@ def get_submission_count():
 
 
 def is_survey_closed(submission_count):
+    if SURVEY_STATUS == "open":
+        return False
+    if SURVEY_STATUS == "closed":
+        return True
+    if SURVEY_STATUS != "auto":
+        st.warning("Invalid SURVEY_STATUS. Use auto, open, or closed.")
+
     if submission_count >= MAX_SUBMISSIONS:
         return True
 
