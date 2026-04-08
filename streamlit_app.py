@@ -14,12 +14,42 @@ import streamlit as st
 DATA_DIR = os.environ.get("DATA_DIR", "data")
 CSV_PATH = os.path.join(DATA_DIR, "submissions.csv")
 COLUMNS = ["FullName", "Email", "Lansing", "Role", "SubmittedAt"]
+MAX_SUBMISSIONS = 25
+# Set as YYYY-MM-DD (America/Detroit).
+SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-04-08")
+CAPACITY_MESSAGE = (
+    "Thank you for your interest! Unfortunately we are at capacity for this in-person session."
+)
 
 # Hidden mirror file (same directory; name starts with a dot)
 RECENT_FILE = os.path.join(os.path.dirname(DATA_DIR), ".recent_submissions.csv")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 _write_lock = threading.Lock()
+
+
+def get_submission_count():
+    if not os.path.exists(CSV_PATH):
+        return 0
+    with open(CSV_PATH, newline="", encoding="utf-8") as f:
+        return sum(1 for _ in csv.DictReader(f))
+
+
+def is_survey_closed(submission_count):
+    if submission_count >= MAX_SUBMISSIONS:
+        return True
+
+    if not SURVEY_CLOSE_DATE:
+        return False
+
+    try:
+        close_date = datetime.strptime(SURVEY_CLOSE_DATE, "%Y-%m-%d").date()
+    except ValueError:
+        st.warning("Invalid SURVEY_CLOSE_DATE format. Use YYYY-MM-DD.")
+        return False
+
+    today = datetime.now(ZoneInfo("America/Detroit")).date()
+    return today >= close_date
 
 def append_row(row_dict):
     is_new = not os.path.exists(CSV_PATH) or os.path.getsize(CSV_PATH) == 0
@@ -45,6 +75,11 @@ st.set_page_config(page_title="AI First Session 2 Sign-Up", page_icon="📝", la
 st.title("AI First Session 2 Sign-Up")
 st.write("Interested in attending Session 2 of the AI First learning series? Sign up below!")
 
+current_count = get_submission_count()
+if is_survey_closed(current_count):
+    st.warning(CAPACITY_MESSAGE)
+    st.stop()
+
 with st.form("signup", clear_on_submit=True):
     full_name = st.text_input("Full name", placeholder="Jane Doe")
     email = st.text_input("Email", placeholder="jane@example.com")
@@ -69,6 +104,12 @@ with st.form("signup", clear_on_submit=True):
     submitted = st.form_submit_button("Submit")
 
 if submitted:
+    # Re-check on submit to avoid accepting entries after close conditions are met.
+    latest_count = get_submission_count()
+    if is_survey_closed(latest_count):
+        st.warning(CAPACITY_MESSAGE)
+        st.stop()
+
     # Minimal validation
     if not full_name.strip():
         st.error("Full name is required.")
@@ -100,7 +141,7 @@ if os.path.exists(CSV_PATH):
         with open(CSV_PATH, newline="", encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
         if rows:
-            st.dataframe(rows[-50:], use_container_width=True)
+            st.dataframe(rows[-25:], use_container_width=True)
         else:
             st.info("No submissions yet.")
     except Exception as e:
