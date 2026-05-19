@@ -38,15 +38,15 @@ def get_submission_count():
 
 
 def is_survey_closed(submission_count):
+    if submission_count >= MAX_SUBMISSIONS:
+        return True
+
     if SURVEY_STATUS == "open":
         return False
     if SURVEY_STATUS == "closed":
         return True
     if SURVEY_STATUS != "auto":
         st.warning("Invalid SURVEY_STATUS. Use auto, open, or closed.")
-
-    if submission_count >= MAX_SUBMISSIONS:
-        return True
 
     if not SURVEY_CLOSE_DATE:
         return False
