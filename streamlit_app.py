@@ -30,6 +30,26 @@ os.makedirs(DATA_DIR, exist_ok=True)
 _write_lock = threading.Lock()
 
 
+def migrate_csv_schema():
+    """Migrate existing CSV to new schema if needed."""
+    if not os.path.exists(CSV_PATH):
+        return
+    
+    try:
+        with open(CSV_PATH, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            if reader.fieldnames != COLUMNS:
+                # Schema mismatch - back up old file and create new one
+                import shutil
+                backup_path = CSV_PATH + ".backup"
+                shutil.move(CSV_PATH, backup_path)
+    except Exception:
+        pass
+
+
+migrate_csv_schema()
+
+
 def get_submission_count():
     if not os.path.exists(CSV_PATH):
         return 0
