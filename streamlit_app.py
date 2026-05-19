@@ -51,9 +51,10 @@ migrate_csv_schema()
 
 
 def get_submission_count():
-    if not os.path.exists(CSV_PATH):
+    path = RECENT_FILE if os.path.exists(RECENT_FILE) and os.path.getsize(RECENT_FILE) > 0 else CSV_PATH
+    if not os.path.exists(path):
         return 0
-    with open(CSV_PATH, newline="", encoding="utf-8") as f:
+    with open(path, newline="", encoding="utf-8") as f:
         return sum(1 for _ in csv.DictReader(f))
 
 
