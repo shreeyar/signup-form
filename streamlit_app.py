@@ -18,7 +18,7 @@ MAX_SUBMISSIONS = 25
 # Set as YYYY-MM-DD (America/Detroit).
 SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-05-28")
 # Backend override: auto, open, or closed.
-SURVEY_STATUS = os.environ.get("SURVEY_STATUS", "auto").strip().lower()
+SURVEY_STATUS = os.environ.get("SURVEY_STATUS", "open").strip().lower()
 CAPACITY_MESSAGE = (
     "Thank you for your interest! Unfortunately we are at capacity for this in-person session."
 )
