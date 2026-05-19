@@ -178,9 +178,10 @@ if submitted:
 st.divider()
 st.subheader("Recent submissions")
 
-if os.path.exists(CSV_PATH):
+preview_path = RECENT_FILE if os.path.exists(RECENT_FILE) and os.path.getsize(RECENT_FILE) > 0 else CSV_PATH
+if os.path.exists(preview_path):
     try:
-        with open(CSV_PATH, newline="", encoding="utf-8") as f:
+        with open(preview_path, newline="", encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
         if rows:
             st.dataframe(rows[-25:], use_container_width=True)
