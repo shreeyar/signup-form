@@ -16,9 +16,9 @@ CSV_PATH = os.path.join(DATA_DIR, "submissions.csv")
 COLUMNS = ["FullName", "Email", "Lansing", "Role", "SubmittedAt"]
 MAX_SUBMISSIONS = 25
 # Set as YYYY-MM-DD (America/Detroit).
-SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-04-08")
+SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-05-28")
 # Backend override: auto, open, or closed.
-SURVEY_STATUS = os.environ.get("SURVEY_STATUS", "closed").strip().lower()
+SURVEY_STATUS = os.environ.get("SURVEY_STATUS", "auto").strip().lower()
 CAPACITY_MESSAGE = (
     "Thank you for your interest! Unfortunately we are at capacity for this in-person session."
 )
@@ -80,9 +80,9 @@ def append_recent_row(row_dict):
             # Only write known columns to keep schema stable
             w.writerow({k: row_dict.get(k, "") for k in COLUMNS})
 
-st.set_page_config(page_title="AI First Session 2 Sign-Up", page_icon="📝", layout="centered")
-st.title("AI First Session 2 Sign-Up")
-st.write("Interested in attending Session 2 of the AI First learning series? Sign up below!")
+st.set_page_config(page_title="AI First Session 3 Sign-Up", page_icon="📝", layout="centered")
+st.title("AI First Session 3 Sign-Up")
+st.write("Interested in attending Session 3 of the AI First learning series? Sign up below!")
 
 current_count = get_submission_count()
 if is_survey_closed(current_count):
@@ -106,7 +106,7 @@ with st.form("signup", clear_on_submit=True):
         ],
     )
     lansing_choice = st.radio(
-        "Will you be co-locating in the Lansing Office on April 14?",
+        "Will you be co-locating in the Lansing Office on June 2?",
         options=["Yes", "No"],
         horizontal=True
     )

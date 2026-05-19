@@ -11,7 +11,7 @@ EVENT = {
 # Location and Time Details
 EVENT_DETAILS = {
     "location": "Topgolf, Auburn Hills",
-    "date": "Tuesday, April 14th",
+    "date": "Tuesday, June 2nd",
     "play_time": "6:00 PM - 8:30 PM",
     "travel_time": "1.5 hours each way",
 }
