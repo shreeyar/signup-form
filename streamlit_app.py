@@ -13,7 +13,7 @@ import streamlit as st
 # Example macOS: export DATA_DIR="$HOME/Library/CloudStorage/OneDrive-OrgName/form-data"
 DATA_DIR = os.environ.get("DATA_DIR", "data")
 CSV_PATH = os.path.join(DATA_DIR, "submissions.csv")
-COLUMNS = ["FullName", "Email", "Lansing", "Role", "SubmittedAt"]
+COLUMNS = ["FullName", "Email", "Lansing", "Role", "SoMProject", "OP", "SubmittedAt"]
 MAX_SUBMISSIONS = 25
 # Set as YYYY-MM-DD (America/Detroit).
 SURVEY_CLOSE_DATE = os.environ.get("SURVEY_CLOSE_DATE", "2026-05-28")
@@ -110,6 +110,14 @@ with st.form("signup", clear_on_submit=True):
         options=["Yes", "No"],
         horizontal=True
     )
+    som_project = st.selectbox(
+        "What is your SoM project?",
+        options=["Bridges", "CCWIS", "MiConnect", "MiIntegrate", "MiLogin", "UIA", "Other"],
+    )
+    op = st.text_input(
+        "What is your OP?",
+        placeholder="e.g. HST, HRST"
+    )
     submitted = st.form_submit_button("Submit")
 
 if submitted:
@@ -126,12 +134,17 @@ if submitted:
     if "@" not in email or "." not in email:
         st.error("Please provide a valid email address.")
         st.stop()
+    if not op.strip():
+        st.error("Please provide your OP.")
+        st.stop()
 
     row = {
         "FullName": full_name.strip(),
         "Email": email.strip(),
         "Lansing": lansing_choice,  # "Yes" or "No" from the radio
         "Role": role,
+        "SoMProject": som_project,
+        "OP": op.strip(),
         "SubmittedAt": datetime.now(ZoneInfo("America/Detroit")).strftime("%Y-%m-%d %H:%M:%S"),
     }
 
